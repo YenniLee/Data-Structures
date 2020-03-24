@@ -21,4 +21,5 @@ class Queue:
         return item 
 
     def len(self):
-        return self.storage.length
+        # return self.storage.length
+        return self.size

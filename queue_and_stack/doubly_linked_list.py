@@ -146,3 +146,13 @@ class DoublyLinkedList:
             current = current.next
         
         return max_value
+
+
+# def find_middle(head):
+#     i = head.next
+#     j = head
+
+#     while i is not None and i.next is not None:
+#         i = i.next.next
+#         j = j.next
+#     return j.value
