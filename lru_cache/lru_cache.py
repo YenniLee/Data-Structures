@@ -12,9 +12,9 @@ class LRUCache:
     """
     def __init__(self, limit=10):
         self.limit = limit
-        self.list = DoublyLinkedList()
-        self.storage_dict = {}
-        self.length = 0
+        self.order = DoublyLinkedList()
+        self.storage_dict = dict()
+        self.size = 0
 
     """
     Retrieves the value associated with the given key. Also
@@ -26,10 +26,22 @@ class LRUCache:
     def get(self, key):
         if key in self.storage_dict:
             node = self.storage_dict[key]
-            self.list.move_to_end(node)
+            self.order.move_to_end(node)
             return node.value[1]
         else:
             return None
+
+    def get_guided(self, key):
+        # key is not in cache - return none
+        if key not in self.storage_dict:
+            return None
+        # key is in cache
+        else:
+            # move it to most recently used
+            node = self.storage_dict[key]
+            self.order.move_to_end(node)
+            # return value 
+            return node.value[1]
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -46,16 +58,43 @@ class LRUCache:
         if key in self.storage_dict:
             node = self.storage_dict[key]
             node.value = (key, value)
-            self.list.move_to_end(node)
+            self.order.move_to_end(node)
             return 
+        # size is at limit
+        if self.size == self.limit:
+            del self.storage_dict[self.order.head.value[0]]
+            self.order.remove_from_head()
+            self.size -= 1
+        # size is not at limit
+        self.order.add_to_tail((key, value))
+        self.storage_dict[key] = self.order.tail
+        self.size += 1
 
-        if self.length == self.limit:
-            del self.storage_dict[self.list.head.value[0]]
-            self.list.remove_from_head()
-            self.length -= 1
-        
-        self.list.add_to_tail((key, value))
-        self.storage_dict[key] = self.list.tail
-        self.length += 1
+
+    def set_guided(self, key, value):
+        # if key/item already exists
+        if key in self.storage_dict:
+            # overwrite the value
+            # where is the value stored
+            node = self.storage_dict[key]
+            node.value = (key, value)
+            # move to the tail (most recently used)
+            self.order.move_to_end(node)
+            return
+        # if size is at limit
+        if len(self.order) == self.limit:
+            # delete the oldest one 
+            # remove from list and storage_dict
+            del self.storage_dict[self.order.head.value[0]]
+            self.order.remove_from_head()
+            # add new one to the end
+
+        # size is not at limit
+        # add to order
+        self.order.add_to_tail((key, value))
+        # add it to storage
+        self.storage_dict[key] = self.order.tail
+
+
 
 
